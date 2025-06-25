@@ -1,0 +1,40 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Fallback color */
+}
+.menu-card {
+    transition: all 0.3s ease;
+}
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.day-btn {
+     transition: all 0.2s ease-in-out;
+}
+.day-active {
+    background-color: #c41230;
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(196, 18, 48, 0.39);
+}
+.modal {
+    transition: opacity 0.3s ease;
+}
+.meal-card-content {
+    white-space: pre-line; /* This is key for showing line breaks from the textarea */
+}
+#loadingOverlay {
+    transition: opacity 0.3s ease-out;
+}
+/* Custom scrollbar for day selector on small screens */
+#daySelector::-webkit-scrollbar, #weekly-view-container::-webkit-scrollbar, #admin-editor-grid::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+}
+#daySelector::-webkit-scrollbar-track, #weekly-view-container::-webkit-scrollbar-track, #admin-editor-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+#daySelector::-webkit-scrollbar-thumb, #weekly-view-container::-webkit-scrollbar-thumb, #admin-editor-grid::-webkit-scrollbar-thumb {
+    background: #c41230;
+    border-radius: 10px;
+}
