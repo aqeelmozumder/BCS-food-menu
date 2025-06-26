@@ -138,7 +138,7 @@ async function fetchAndDisplayFoodFact() {
     const prompt = `Give me a one-sentence 'Did you know?' fun fact about any food. Make it interesting for a high school audience.`;
     const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKey = "";
+    const apiKey = firebaseConfig.apiKey;
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     try {
