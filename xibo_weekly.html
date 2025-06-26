@@ -10,29 +10,27 @@
             background-color: transparent;
             color: white;
             margin: 0;
-            overflow: hidden; /* Crucial: Hides content outside the screen */
+            overflow: hidden; /* Hides content outside the screen */
         }
 
         /* The viewport for the scrolling content */
         .scroll-viewport {
-            height: 1474px; /* Match your screen's content height */
-            width: 1052px;  /* Match your screen's content width */
+            height: 1474px; /* Your specified content height */
+            width: 1052px;  /* Your specified content width */
             padding: 20px;
             box-sizing: border-box;
         }
 
         /* The container that will be animated */
         .scroll-content {
-            /* The animation: 'scroll-up' is the name, 40s is the duration */
-            animation: scroll-up 40s linear infinite;
+            animation: scroll-up 45s linear infinite; /* Increased duration for smoother scroll */
         }
         
-        /* When the mouse is over the screen, pause the animation */
         .scroll-viewport:hover .scroll-content {
             animation-play-state: paused;
         }
 
-        /* Keyframes define the start and end points of the animation */
+        /* Keyframes define the animation for the seamless loop */
         @keyframes scroll-up {
             from {
                 transform: translateY(0%);
@@ -42,18 +40,15 @@
             }
         }
         
+        /* This block now uses CSS Grid for the layout */
         .content-block {
-            /* This holds the two-column layout */
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 2em 1.5em; /* Row gap and Column gap */
+            padding-bottom: 2em; /* Add padding to the bottom for seamless loop */
         }
 
-        .column {
-            width: 48%; 
-        }
-        .day-block {
-            margin-bottom: 1.5em; 
-        }
+        /* Individual day block styling */
         .day-header {
             font-size: 3.0em;
             font-weight: bold;
@@ -95,19 +90,6 @@
             Thursday: "#4ade80", Friday: "#38bdf8", Saturday: "#c084fc", Sunday: "#f472b6"
         };
 
-        function buildDayHtml(day, menuData) {
-            const dayMenu = menuData[day] || {};
-            const headerColor = dayColors[day] || 'white';
-            let dayHtml = `<div class="day-block">`;
-            dayHtml += `<div class="day-header" style="color: ${headerColor};">${day}</div>`;
-            mealTypes.forEach(meal => {
-                const mealText = dayMenu[meal] || 'No service';
-                dayHtml += `<div class="meal-item"><span class="meal-name">${meal}:</span> ${mealText}</div>`;
-            });
-            dayHtml += `</div>`;
-            return dayHtml;
-        }
-
         async function fetchAndRenderMenu() {
             const primaryContainer = document.getElementById('content-primary');
             const secondaryContainer = document.getElementById('content-secondary');
@@ -117,25 +99,27 @@
 
                 if (docSnap.exists()) {
                     const menuData = docSnap.data();
-                    
-                    let col1Html = '<div class="column">';
-                    let col2Html = '<div class="column">';
+                    let fullContentHtml = '';
 
-                    // Split days between the two columns
-                    daysOfWeek.forEach((day, index) => {
-                        if (index < 4) { // Monday-Thursday in column 1
-                            col1Html += buildDayHtml(day, menuData);
-                        } else { // Friday-Sunday in column 2
-                            col2Html += buildDayHtml(day, menuData);
-                        }
+                    // Loop through each day and create a block for it
+                    daysOfWeek.forEach(day => {
+                        const dayMenu = menuData[day] || {};
+                        const headerColor = dayColors[day] || 'white';
+                        
+                        let dayHtml = `<div class="day-block">`;
+                        dayHtml += `<div class="day-header" style="color: ${headerColor};">${day}</div>`;
+                        mealTypes.forEach(meal => {
+                            const mealText = dayMenu[meal] || 'No service';
+                            dayHtml += `<div class="meal-item"><span class="meal-name">${meal}:</span> ${mealText}</div>`;
+                        });
+                        dayHtml += `</div>`;
+                        fullContentHtml += dayHtml;
                     });
-
-                    col1Html += '</div>';
-                    col2Html += '</div>';
                     
-                    const fullContent = col1Html + col2Html;
-                    primaryContainer.innerHTML = fullContent;
-                    secondaryContainer.innerHTML = fullContent; // Duplicate content for seamless scroll
+                    // Render the full grid into both containers for the seamless scroll
+                    primaryContainer.innerHTML = fullContentHtml;
+                    secondaryContainer.innerHTML = fullContentHtml;
+
                 } else {
                     primaryContainer.innerHTML = 'Weekly menu not available.';
                 }
