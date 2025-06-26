@@ -14,26 +14,25 @@
             box-sizing: border-box;
         }
         #weekly-menu-container {
-            display: flex; /* Establishes the two-column layout */
+            display: flex;
             justify-content: space-between;
             width: 100%;
             height: 100%;
         }
         .column {
-            width: 48%; /* Each column takes up just under half the width */
+            width: 48%; 
         }
         .day-block {
-            margin-bottom: 1.2em; /* Space between each day */
+            margin-bottom: 1.5em; 
         }
         .day-header {
-            font-size: 2.8em; /* Adjusted for column width */
+            font-size: 3.0em; /* --- FONT BIGGER --- */
             font-weight: bold;
-            border-bottom: 2px solid white;
             margin-bottom: 0.25em;
             padding-bottom: 0.1em;
         }
         .meal-item {
-            font-size: 2.0em; /* Adjusted for column width */
+            font-size: 2.3em; /* --- FONT BIGGER --- */
             line-height: 1.3;
             white-space: pre-line;
         }
@@ -59,6 +58,17 @@
 
         const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         const mealTypes = ["Breakfast", "Lunch", "Dinner"];
+        
+        // --- COLOR MAPPING from your ui.js file ---
+        const dayColors = {
+            Monday:    "#f87171", // Red
+            Tuesday:   "#fb923c", // Orange
+            Wednesday: "#facc15", // Yellow
+            Thursday:  "#4ade80", // Green
+            Friday:    "#38bdf8", // Sky
+            Saturday:  "#c084fc", // Purple
+            Sunday:    "#f472b6"  // Pink
+        };
 
         async function fetchAndRenderWeeklyMenu() {
             const col1Container = document.getElementById('column1');
@@ -74,8 +84,11 @@
 
                     daysOfWeek.forEach((day, index) => {
                         const dayMenu = menuData[day] || {};
+                        const headerColor = dayColors[day] || 'white';
+                        
                         let dayHtml = `<div class="day-block">`;
-                        dayHtml += `<div class="day-header">${day}</div>`;
+                        // Apply the color directly to the header's style
+                        dayHtml += `<div class="day-header" style="color: ${headerColor};">${day}</div>`;
 
                         mealTypes.forEach(meal => {
                             const mealText = dayMenu[meal] || 'No service';
@@ -83,10 +96,9 @@
                         });
                         dayHtml += `</div>`;
 
-                        // Split the week: 4 days in column 1, 3 days in column 2
-                        if (index < 4) {
+                        if (index < 4) { // Monday-Thursday
                             col1Html += dayHtml;
-                        } else {
+                        } else { // Friday-Sunday
                             col2Html += dayHtml;
                         }
                     });
@@ -95,7 +107,6 @@
                     col2Container.innerHTML = col2Html;
                 } else {
                     col1Container.textContent = 'Weekly menu not available.';
-                    console.log("Menu document not found in Firestore!");
                 }
             } catch (error) {
                 console.error('Error fetching weekly menu:', error);
