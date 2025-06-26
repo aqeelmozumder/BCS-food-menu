@@ -1,3 +1,5 @@
+import { firebaseConfig } from './config.js'; // Import the configuration
+
 // --- UI ELEMENT SELECTORS ---
 const ui = {
     daySelector: document.getElementById('daySelector'),
