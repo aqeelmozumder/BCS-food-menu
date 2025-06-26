@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinner Menu</title>
+    <style>
+        /* Basic styling for the TV display */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent; /* Essential for Xibo's transparent background option */
+            color: white; /* Default text color, change if needed */
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #meal-content {
+            font-size: 2.5em; /* Adjust font size as needed for your display */
+            white-space: pre-line; /* This respects line breaks entered in the menu editor */
+        }
+        #meal-title {
+            font-size: 3.5em; /* Adjust font size as needed */
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="meal-title">Dinner</div>
+    <div id="meal-content">Loading Menu...</div>
+
+    <script type="module">
+        // Import necessary functions from the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import your specific Firebase project configuration
+        import { firebaseConfig } from './js/config.js';
+
+        // --- Firebase Initialization ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const appId = firebaseConfig.appId;
+
+        async function fetchMenu() {
+            const mealContainer = document.getElementById('meal-content');
+            try {
+                // Reference to the document in Firestore
+                const menuDocRef = doc(db, `artifacts/${appId}/public/data/menu`, 'weeklyMenu');
+                
+                // Fetch the document from Firestore
+                const docSnap = await getDoc(menuDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Get today's day of the week (e.g., "Thursday")
+                    const today = new Date().toLocaleString('en-us', { weekday: 'long' });
+                    
+                    // --- EDIT THIS LINE FOR EACH MEAL ---
+                    const mealText = data[today] && data[today].Dinner ? data[today].Dinner : 'No service today.';
+                    
+                    // Insert the meal content into the page
+                    mealContainer.textContent = mealText;
+                } else {
+                    mealContainer.textContent = 'Menu not available.';
+                    console.log("Menu document not found in Firestore!");
+                }
+            } catch (error) {
+                console.error('Error fetching menu data:', error);
+                mealContainer.textContent = 'Failed to load menu.';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchMenu);
+    </script>
+</body>
+</html>
