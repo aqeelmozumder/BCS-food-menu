@@ -10,15 +10,44 @@
             background-color: transparent;
             color: white;
             margin: 0;
+            overflow: hidden; /* Crucial: Hides content outside the screen */
+        }
+
+        /* The viewport for the scrolling content */
+        .scroll-viewport {
+            height: 1474px; /* Match your screen's content height */
+            width: 1052px;  /* Match your screen's content width */
             padding: 20px;
             box-sizing: border-box;
         }
-        #weekly-menu-container {
+
+        /* The container that will be animated */
+        .scroll-content {
+            /* The animation: 'scroll-up' is the name, 40s is the duration */
+            animation: scroll-up 40s linear infinite;
+        }
+        
+        /* When the mouse is over the screen, pause the animation */
+        .scroll-viewport:hover .scroll-content {
+            animation-play-state: paused;
+        }
+
+        /* Keyframes define the start and end points of the animation */
+        @keyframes scroll-up {
+            from {
+                transform: translateY(0%);
+            }
+            to {
+                transform: translateY(-50%);
+            }
+        }
+        
+        .content-block {
+            /* This holds the two-column layout */
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            height: 100%;
         }
+
         .column {
             width: 48%; 
         }
@@ -26,13 +55,13 @@
             margin-bottom: 1.5em; 
         }
         .day-header {
-            font-size: 3.0em; /* --- FONT BIGGER --- */
+            font-size: 3.0em;
             font-weight: bold;
             margin-bottom: 0.25em;
             padding-bottom: 0.1em;
         }
         .meal-item {
-            font-size: 2.3em; /* --- FONT BIGGER --- */
+            font-size: 2.3em;
             line-height: 1.3;
             white-space: pre-line;
         }
@@ -42,9 +71,11 @@
     </style>
 </head>
 <body>
-    <div id="weekly-menu-container">
-        <div id="column1" class="column"></div>
-        <div id="column2" class="column"></div>
+    <div class="scroll-viewport">
+        <div class="scroll-content">
+            <div id="content-primary" class="content-block"></div>
+            <div id="content-secondary" class="content-block"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -59,62 +90,62 @@
         const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         const mealTypes = ["Breakfast", "Lunch", "Dinner"];
         
-        // --- COLOR MAPPING from your ui.js file ---
         const dayColors = {
-            Monday:    "#f87171", // Red
-            Tuesday:   "#fb923c", // Orange
-            Wednesday: "#facc15", // Yellow
-            Thursday:  "#4ade80", // Green
-            Friday:    "#38bdf8", // Sky
-            Saturday:  "#c084fc", // Purple
-            Sunday:    "#f472b6"  // Pink
+            Monday: "#f87171", Tuesday: "#fb923c", Wednesday: "#facc15",
+            Thursday: "#4ade80", Friday: "#38bdf8", Saturday: "#c084fc", Sunday: "#f472b6"
         };
 
-        async function fetchAndRenderWeeklyMenu() {
-            const col1Container = document.getElementById('column1');
-            const col2Container = document.getElementById('column2');
+        function buildDayHtml(day, menuData) {
+            const dayMenu = menuData[day] || {};
+            const headerColor = dayColors[day] || 'white';
+            let dayHtml = `<div class="day-block">`;
+            dayHtml += `<div class="day-header" style="color: ${headerColor};">${day}</div>`;
+            mealTypes.forEach(meal => {
+                const mealText = dayMenu[meal] || 'No service';
+                dayHtml += `<div class="meal-item"><span class="meal-name">${meal}:</span> ${mealText}</div>`;
+            });
+            dayHtml += `</div>`;
+            return dayHtml;
+        }
+
+        async function fetchAndRenderMenu() {
+            const primaryContainer = document.getElementById('content-primary');
+            const secondaryContainer = document.getElementById('content-secondary');
             try {
                 const menuDocRef = doc(db, `artifacts/${appId}/public/data/menu`, 'weeklyMenu');
                 const docSnap = await getDoc(menuDocRef);
 
                 if (docSnap.exists()) {
                     const menuData = docSnap.data();
-                    let col1Html = "";
-                    let col2Html = "";
+                    
+                    let col1Html = '<div class="column">';
+                    let col2Html = '<div class="column">';
 
+                    // Split days between the two columns
                     daysOfWeek.forEach((day, index) => {
-                        const dayMenu = menuData[day] || {};
-                        const headerColor = dayColors[day] || 'white';
-                        
-                        let dayHtml = `<div class="day-block">`;
-                        // Apply the color directly to the header's style
-                        dayHtml += `<div class="day-header" style="color: ${headerColor};">${day}</div>`;
-
-                        mealTypes.forEach(meal => {
-                            const mealText = dayMenu[meal] || 'No service';
-                            dayHtml += `<div class="meal-item"><span class="meal-name">${meal}:</span> ${mealText}</div>`;
-                        });
-                        dayHtml += `</div>`;
-
-                        if (index < 4) { // Monday-Thursday
-                            col1Html += dayHtml;
-                        } else { // Friday-Sunday
-                            col2Html += dayHtml;
+                        if (index < 4) { // Monday-Thursday in column 1
+                            col1Html += buildDayHtml(day, menuData);
+                        } else { // Friday-Sunday in column 2
+                            col2Html += buildDayHtml(day, menuData);
                         }
                     });
 
-                    col1Container.innerHTML = col1Html;
-                    col2Container.innerHTML = col2Html;
+                    col1Html += '</div>';
+                    col2Html += '</div>';
+                    
+                    const fullContent = col1Html + col2Html;
+                    primaryContainer.innerHTML = fullContent;
+                    secondaryContainer.innerHTML = fullContent; // Duplicate content for seamless scroll
                 } else {
-                    col1Container.textContent = 'Weekly menu not available.';
+                    primaryContainer.innerHTML = 'Weekly menu not available.';
                 }
             } catch (error) {
                 console.error('Error fetching weekly menu:', error);
-                col1Container.textContent = 'Failed to load weekly menu.';
+                primaryContainer.innerHTML = 'Failed to load weekly menu.';
             }
         }
 
-        document.addEventListener("DOMContentLoaded", fetchAndRenderWeeklyMenu);
+        document.addEventListener("DOMContentLoaded", fetchAndRenderMenu);
     </script>
 </body>
 </html>
