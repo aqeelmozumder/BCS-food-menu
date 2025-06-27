@@ -6,6 +6,8 @@ This project is a modern, responsive web application designed to display the wee
 
 The application is hosted at [food.brentwood.ca](https://food.brentwood.ca) and includes specialized views designed for integration with the Xibo digital signage system used in the dining hall.
 
+> **ℹ️ For in-depth technical documentation, including architecture details, deployment procedures, and troubleshooting tips, please refer to the project Wiki.**
+
 ## 2. Features
 
 * 🍽️ **Dynamic Menu Display**: Users can toggle between a daily view (showing Breakfast, Lunch, and Dinner for the selected day) and a full weekly view.
