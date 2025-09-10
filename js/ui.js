@@ -8,7 +8,7 @@ const ui = {
     weeklyViewContainer: document.getElementById('weekly-view-container'),
     modalContainer: document.getElementById('modal-container'),
     headerButtons: document.getElementById('header-buttons'),
-    foodFactContainer: document.getElementById('food-fact-container')
+   // foodFactContainer: document.getElementById('food-fact-container')
 };
 
 const mealTypes = ["Breakfast", "Lunch", "Dinner"];
@@ -19,7 +19,7 @@ const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Sat
 export function renderPage(state) {
     updateHeaderButtons(state.currentUser, state.isWeeklyView);
     renderDaySelector(state.selectedDay);
-    ui.foodFactContainer.classList.add('hidden'); 
+    //ui.foodFactContainer.classList.add('hidden'); 
     ui.dailyViewContainer.style.display = 'none';
     ui.weeklyViewContainer.classList.add('hidden');
 
@@ -77,9 +77,9 @@ function renderMealCards(menuData, selectedDay, today) {
         ui.dailyCardsGrid.appendChild(card);
     });
 
-    if (selectedDay === today) {
-        fetchAndDisplayFoodFact();
-    }
+    // if (selectedDay === today) {
+    //     fetchAndDisplayFoodFact();
+    // }
 }
 
 function renderWeeklyView(menuData) {
@@ -125,58 +125,58 @@ function renderWeeklyView(menuData) {
     ui.weeklyViewContainer.appendChild(grid);
 }
 
-async function fetchAndDisplayFoodFact() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const cachedFact = JSON.parse(localStorage.getItem('foodFactOfTheDay'));
+// async function fetchAndDisplayFoodFact() {
+//     const todayStr = new Date().toISOString().split('T')[0];
+//     const cachedFact = JSON.parse(localStorage.getItem('foodFactOfTheDay'));
 
-    if (cachedFact && cachedFact.date === todayStr) {
-        displayFoodFact(cachedFact.fact);
-        return;
-    }
+//     if (cachedFact && cachedFact.date === todayStr) {
+//         displayFoodFact(cachedFact.fact);
+//         return;
+//     }
 
-    ui.foodFactContainer.innerHTML = `<p class="font-semibold text-amber-800 italic">Fetching a fun fact...</p>`;
-    ui.foodFactContainer.classList.remove('hidden');
+//     ui.foodFactContainer.innerHTML = `<p class="font-semibold text-amber-800 italic">Fetching a fun fact...</p>`;
+//     ui.foodFactContainer.classList.remove('hidden');
 
-    const prompt = `Give me a one-sentence 'Did you know?' fun fact about any food. Make it interesting for a high school audience.`;
-    const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-    const payload = { contents: chatHistory };
-    const apiKey = firebaseConfig.apiKey;
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+//     const prompt = `Give me a one-sentence 'Did you know?' fun fact about any food. Make it interesting for a high school audience.`;
+//     const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+//     const payload = { contents: chatHistory };
+//     const apiKey = firebaseConfig.apiKey;
+//     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
-        const result = await response.json();
-        const fact = result.candidates[0]?.content?.parts[0]?.text;
-        if (fact) {
-            localStorage.setItem('foodFactOfTheDay', JSON.stringify({ date: todayStr, fact: fact }));
-            displayFoodFact(fact);
-        } else {
-            ui.foodFactContainer.classList.add('hidden');
-        }
-    } catch (error) {
-        console.error("Food Fact API Error:", error);
-        ui.foodFactContainer.classList.add('hidden');
-    }
-}
+//     try {
+//         const response = await fetch(apiUrl, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(payload)
+//         });
+//         if (!response.ok) throw new Error(`API error: ${response.status}`);
+//         const result = await response.json();
+//         const fact = result.candidates[0]?.content?.parts[0]?.text;
+//         if (fact) {
+//             localStorage.setItem('foodFactOfTheDay', JSON.stringify({ date: todayStr, fact: fact }));
+//             displayFoodFact(fact);
+//         } else {
+//             ui.foodFactContainer.classList.add('hidden');
+//         }
+//     } catch (error) {
+//         console.error("Food Fact API Error:", error);
+//         ui.foodFactContainer.classList.add('hidden');
+//     }
+// }
 
-function displayFoodFact(fact) {
-    ui.foodFactContainer.innerHTML = `
-        <div class="flex items-start">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-1.131 1.131M21 12h-1M4 12H3m3.343-5.657l-1.131-1.131M12 21v-1m-6.657-3.343l1.131-1.131" />
-            </svg>
-            <div>
-                <h4 class="font-bold text-amber-900">Did You Know?</h4>
-                <p class="text-amber-800">${fact}</p>
-            </div>
-        </div>`;
-    ui.foodFactContainer.classList.remove('hidden');
-}
+// function displayFoodFact(fact) {
+//     ui.foodFactContainer.innerHTML = `
+//         <div class="flex items-start">
+//             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+//                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-1.131 1.131M21 12h-1M4 12H3m3.343-5.657l-1.131-1.131M12 21v-1m-6.657-3.343l1.131-1.131" />
+//             </svg>
+//             <div>
+//                 <h4 class="font-bold text-amber-900">Did You Know?</h4>
+//                 <p class="text-amber-800">${fact}</p>
+//             </div>
+//         </div>`;
+//     ui.foodFactContainer.classList.remove('hidden');
+// }
 
 function updateHeaderButtons(user, isWeeklyView) {
     ui.headerButtons.innerHTML = '';
